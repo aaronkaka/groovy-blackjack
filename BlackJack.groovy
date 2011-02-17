@@ -104,6 +104,7 @@ class PlayerHand {
                 def nextCard = shoe.remove(0)
                 println "Player receives:"
                 nextCard.show()
+                Thread.sleep(1000)
 
                 if (nextCard.rank == 'A') numPlayerAces++
 
@@ -264,7 +265,8 @@ def playerStake = 300
 NEWHAND: while (shoe.size() > CUTCARD) {
 
     println "***************************************"
-
+    Thread.sleep(2000)
+    
     if (playerStake <= 0) break NEWHAND
 
     print "Your stake is ${nf.format(playerStake)}. Enter bet or quit(q): "
@@ -300,6 +302,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
 
     println "Dealer is showing: "
     card4.show()
+    Thread.sleep(1000)
     println "You have: "
     showPair(card1, card3)
 
@@ -373,7 +376,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
             split1 = shoe.remove(0)
             split2 = shoe.remove(0)
 
-            println "First split hand:"
+            println "\nFirst split hand:"
             showPair(card1, split1)
 
             playerTotal = card1.value + split1.value
@@ -391,7 +394,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
             split1Hand.playOut()
             playerStake = split1Hand.playerStake
 
-            println "Second split hand:"
+            println "\nSecond split hand:"
             showPair(card3, split2)
 
             playerTotal = card3.value + split2.value
@@ -454,6 +457,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
 
     } // end No one has BJ
 
+    Thread.sleep(2000)
     println "Dealer's other card was:"
     card2.show()
 
@@ -515,4 +519,4 @@ NEWHAND: while (shoe.size() > CUTCARD) {
 
 } // end NEWHAND
 
-println "Player walks away with ${nf.format(playerStake)}"
+println "Player walks away with ${nf.format(playerStake)}\n"
