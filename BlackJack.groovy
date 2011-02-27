@@ -209,6 +209,30 @@ def showPair = { firstCard, secondCard ->
         println "-".padRight(padding+1, '-') + "  " + "-".padRight(padding+1, '-')
 }
 
+def processSplitHand = { splitHand, dealerTotal, dealerHasBJ, playerStake, which ->
+
+    println "Player's " + which + " split hand totals " + splitHand.playerTotal
+    if (dealerTotal < 22 && splitHand.playerTotal < 22) {
+        if (dealerTotal > splitHand.playerTotal) {
+            println "Dealer wins against " + which + " split hand"
+            if (!dealerHasBJ)
+                playerStake -= splitHand.playerBet
+        }
+        if (splitHand.playerTotal > dealerTotal) {
+            println "Player wins " + which + " split hand!"
+            if (splitHand.playerHasBJ)
+                playerStake += splitHand.playerBet * 1.5
+            else
+                playerStake += splitHand.playerBet
+        }
+        if (splitHand.playerTotal == dealerTotal) {
+            println "Push on " + which + " split hand..."
+        }
+    }
+
+    return playerStake
+}
+
 def addDeck = { deck ->
 
     deck.add(new Card('A', Suit.CLUBS, ACE))
@@ -252,14 +276,21 @@ def testDeck = { deck ->
     deck.add(new Card('A', Suit.HEARTS, ACE))
     deck.add(new Card('A', Suit.DIAMONDS, ACE))
     deck.add(new Card('A', Suit.SPADES, ACE))
+    deck.add(new Card('10', Suit.CLUBS, 10))
+    deck.add(new Card('10', Suit.CLUBS, 10))
+    deck.add(new Card('10', Suit.CLUBS, 10))
+    deck.add(new Card('10', Suit.CLUBS, 10))
     deck.add(new Card('5', Suit.CLUBS, 5))
-    deck.add(new Card('3', Suit.CLUBS, 3))
-    deck.add(new Card('Q', Suit.DIAMONDS, 10))
+    deck.add(new Card('5', Suit.CLUBS, 5))
+    deck.add(new Card('5', Suit.CLUBS, 5))
+    deck.add(new Card('5', Suit.CLUBS, 5))
+    deck.add(new Card('5', Suit.CLUBS, 5))
+    deck.add(new Card('5', Suit.CLUBS, 5))
 }
 // END CLOSURES
 
 def numOfDecks = 2
-def shoe = shuffle(numOfDecks, addDeck)
+def shoe = shuffle(numOfDecks, testDeck)
 def playerStake = 300
 
 NEWHAND: while (shoe.size() > CUTCARD) {
@@ -479,41 +510,12 @@ NEWHAND: while (shoe.size() > CUTCARD) {
             }
         }
     } else {
+        
         println "Dealer totals " + dealerTotal
 
-        println "Player's first split hand totals " + split1Hand.playerTotal
-        if (dealerTotal < 22 && split1Hand.playerTotal < 22) {
-            if (dealerTotal > split1Hand.playerTotal) {
-                println "Dealer wins against first split hand"
-                if (!dealerHasBJ)
-                    playerStake -= split1Hand.playerBet
-            }
-            if (split1Hand.playerTotal > dealerTotal) {
-                println "Player wins first split hand!"
-                if (!split1Hand.playerHasBJ)
-                    playerStake += split1Hand.playerBet
-            }
-            if (split1Hand.playerTotal == dealerTotal) {
-                println "Push on first split hand..."
-            }
-        }
+        playerStake = processSplitHand(split1Hand, dealerTotal, dealerHasBJ, playerStake, "first")
 
-        println "Player's second split hand totals " + split2Hand.playerTotal
-        if (dealerTotal < 22 && split2Hand.playerTotal < 22) {
-            if (dealerTotal > split2Hand.playerTotal) {
-                println "Dealer wins against second split hand"
-                if (!dealerHasBJ)
-                    playerStake -= split2Hand.playerBet
-            }
-            if (split2Hand.playerTotal > dealerTotal) {
-                println "Player wins second split hand!"
-                if (!split2Hand.playerHasBJ)
-                    playerStake += split2Hand.playerBet
-            }
-            if (split2Hand.playerTotal == dealerTotal) {
-                println "Push on second split hand..."
-            }
-        }
+        playerStake = processSplitHand(split2Hand, dealerTotal, dealerHasBJ, playerStake, "second")
 
     }
 
