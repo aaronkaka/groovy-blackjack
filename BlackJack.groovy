@@ -70,8 +70,9 @@ class PlayerHand {
     int numPlayerAces
     int playerAcesAdjusted
     boolean playerHasBJ
+    boolean splitAces
 
-    PlayerHand (ArrayList tableShoe, int cutCard, int bet, BigDecimal stake, int total, int numAces, int acesAdjusted, boolean hasBJ) {
+    PlayerHand (ArrayList tableShoe, int cutCard, int bet, BigDecimal stake, int total, int numAces, int acesAdjusted, boolean hasBJ, boolean splittingAces) {
         shoe = tableShoe
         CUTCARD = cutCard
         playerBet = bet
@@ -80,16 +81,19 @@ class PlayerHand {
         numPlayerAces = numAces
         playerAcesAdjusted = acesAdjusted
         playerHasBJ = hasBJ
+        splitAces = splittingAces
     }
 
     def playOut() {
-        
+
+      if (!splitAces) {
+
         PLAYERHAND: while (shoe.size() > CUTCARD) {
             print "Stand(s)/Hit(h)/Double(d)? "
             def input = new BufferedReader(new InputStreamReader(System.in)).readLine()
 
             // If Double Down
-            if (input.toUpperCase() == "D") {
+            if (input.equalsIgnoreCase("D")) {
                 if (playerBet*2 > playerStake) {
                     println "You don't have enough money to double your bet!"
                     continue PLAYERHAND
@@ -99,7 +103,7 @@ class PlayerHand {
             }
 
             // If Hit or Double
-            if (!(input.toUpperCase() == "S")) {
+            if (!(input.equalsIgnoreCase("S"))) {
 
                 def nextCard = shoe.remove(0)
                 println "Player receives:"
@@ -127,7 +131,7 @@ class PlayerHand {
                     }
                 }
 
-                if (input.toUpperCase() == "D") break PLAYERHAND
+                if (input.equalsIgnoreCase("D")) break PLAYERHAND
 
 
             } else { // Stand
@@ -147,7 +151,17 @@ class PlayerHand {
                 break PLAYERHAND
             }
         } // end PLAYERHAND
-        
+
+       } else {
+
+           // Split Aces, player hand receives no more cards
+           if (playerTotal > 21) {
+               // Player has AA
+               playerTotal -= 10
+               playerAcesAdjusted++
+           }
+       }
+
     }
 }
 
@@ -276,21 +290,21 @@ def testDeck = { deck ->
     deck.add(new Card('A', Suit.HEARTS, ACE))
     deck.add(new Card('A', Suit.DIAMONDS, ACE))
     deck.add(new Card('A', Suit.SPADES, ACE))
-    deck.add(new Card('10', Suit.CLUBS, 10))
-    deck.add(new Card('10', Suit.CLUBS, 10))
-    deck.add(new Card('10', Suit.CLUBS, 10))
-    deck.add(new Card('10', Suit.CLUBS, 10))
-    deck.add(new Card('5', Suit.CLUBS, 5))
-    deck.add(new Card('5', Suit.CLUBS, 5))
-    deck.add(new Card('5', Suit.CLUBS, 5))
-    deck.add(new Card('5', Suit.CLUBS, 5))
-    deck.add(new Card('5', Suit.CLUBS, 5))
-    deck.add(new Card('5', Suit.CLUBS, 5))
+    deck.add(new Card('A', Suit.SPADES, ACE))
+    deck.add(new Card('A', Suit.SPADES, ACE))
+    deck.add(new Card('A', Suit.SPADES, ACE))
+    deck.add(new Card('A', Suit.SPADES, ACE))
+    deck.add(new Card('A', Suit.SPADES, ACE))
+    deck.add(new Card('A', Suit.SPADES, ACE))
+    deck.add(new Card('A', Suit.SPADES, ACE))
+    deck.add(new Card('A', Suit.SPADES, ACE))
+    deck.add(new Card('A', Suit.SPADES, ACE))
+    deck.add(new Card('A', Suit.SPADES, ACE))
 }
 // END CLOSURES
 
 def numOfDecks = 2
-def shoe = shuffle(numOfDecks, testDeck)
+def shoe = shuffle(numOfDecks, addDeck)
 def playerStake = 300
 
 NEWHAND: while (shoe.size() > CUTCARD) {
@@ -340,7 +354,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
     if (card4.rank == 'A') {
         print "Do you want insurance (y/n)? "
         def insuranceInput = new BufferedReader(new InputStreamReader(System.in)).readLine()
-        if (insuranceInput.toUpperCase() == 'Y') {
+        if (insuranceInput.equalsIgnoreCase("Y")) {
             if (playerStake >= playerBet/2) {
                 if (card2.value == 10) {
                     playerStake += playerBet
@@ -357,12 +371,10 @@ NEWHAND: while (shoe.size() > CUTCARD) {
     dealerTotal = card2.value + card4.value
     if (card2.rank == 'A') numDealerAces++
     if (card4.rank == 'A') numDealerAces++
-    if (card2.rank == 'A' && card4.rank == 'A') dealerAcesAdjusted++
 
     playerTotal = card1.value + card3.value
     if (card1.rank == 'A') numPlayerAces++
     if (card3.rank == 'A') numPlayerAces++
-    if (card1.rank == 'A' && card3.rank == 'A') playerAcesAdjusted++
 
     dealerHasBJ = false
     if (dealerTotal == 21) {
@@ -383,7 +395,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
     else if (dealerHasBJ)
       playerStake -= playerBet
 
-    def playerHand = new PlayerHand(shoe, CUTCARD, playerBet, playerStake, playerTotal, numPlayerAces, playerAcesAdjusted, false)
+    def playerHand = new PlayerHand(shoe, CUTCARD, playerBet, playerStake, playerTotal, numPlayerAces, playerAcesAdjusted, false, false)
     def split1Hand = null
     def split2Hand = null
     def isSplit = false
@@ -393,7 +405,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
         if (card1.rank.equals(card3.rank)) {
             print "Do you wish to split (y/n)? "
             def splitInput = new BufferedReader(new InputStreamReader(System.in)).readLine()
-            if (splitInput.toUpperCase() == 'Y') isSplit = true
+            if (splitInput.equalsIgnoreCase("Y")) isSplit = true
         }
 
         if (!isSplit) {
@@ -404,6 +416,9 @@ NEWHAND: while (shoe.size() > CUTCARD) {
             playerTotal = playerHand.playerTotal
             
         } else {
+            splittingAces = false
+            if (card1.rank == 'A') splittingAces = true
+
             split1 = shoe.remove(0)
             split2 = shoe.remove(0)
 
@@ -415,15 +430,15 @@ NEWHAND: while (shoe.size() > CUTCARD) {
             playerAcesAdjusted = 0
             if (card1.rank == 'A') numPlayerAces++
             if (split1.rank == 'A') numPlayerAces++
-            if (card1.rank == 'A' && split1.rank == 'A') playerAcesAdjusted++
+            
             split1PlayerHasBJ = false
-            if (playerTotal == 21) {
+            if (playerTotal == 21 && !splittingAces) {
                 println "Player has Blackjack on first split hand!"
                 split1PlayerHasBJ = true
             }
-            split1Hand = new PlayerHand(shoe, CUTCARD, playerBet, playerStake, playerTotal, numPlayerAces, playerAcesAdjusted, split1PlayerHasBJ)
+            split1Hand = new PlayerHand(shoe, CUTCARD, playerBet, playerStake, playerTotal, numPlayerAces, playerAcesAdjusted, split1PlayerHasBJ, splittingAces)
             split1Hand.playOut()
-            playerStake = split1Hand.playerStake
+            playerStake = split1Hand.playerStake // account for player bust on hit/double
 
             println "\nSecond split hand:"
             showPair(card3, split2)
@@ -433,19 +448,22 @@ NEWHAND: while (shoe.size() > CUTCARD) {
             playerAcesAdjusted = 0
             if (card3.rank == 'A') numPlayerAces++
             if (split2.rank == 'A') numPlayerAces++
-            if (card3.rank == 'A' && split2.rank == 'A') playerAcesAdjusted++
+            
             split2PlayerHasBJ = false
-            if (playerTotal == 21) {
+            if (playerTotal == 21 && !splittingAces) {
                 println "Player has Blackjack on second split hand!"
                 split2PlayerHasBJ = true
             }
-            split2Hand = new PlayerHand(shoe, CUTCARD, playerBet, playerStake, playerTotal, numPlayerAces, playerAcesAdjusted, split2PlayerHasBJ)
+            split2Hand = new PlayerHand(shoe, CUTCARD, playerBet, playerStake, playerTotal, numPlayerAces, playerAcesAdjusted, split2PlayerHasBJ, splittingAces)
             split2Hand.playOut()
-            playerStake = split2Hand.playerStake
+            playerStake = split2Hand.playerStake // account for player bust on hit/double
         }
 
         DEALERHAND: while (shoe.size() > CUTCARD) {
 
+            def testNumDealerAces = numDealerAces
+            def testDealerAcesAdjusted = dealerAcesAdjusted
+            def testDealerTotal = dealerTotal
             if ( (!isSplit && playerTotal < 22 && dealerCanTakeCard(numDealerAces, dealerAcesAdjusted, dealerTotal)) ||
                 (isSplit && !(split1Hand.playerTotal > 21 && split2Hand.playerTotal > 21) && dealerCanTakeCard(numDealerAces, dealerAcesAdjusted, dealerTotal)) ) {
 
