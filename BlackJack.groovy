@@ -12,7 +12,8 @@ NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.US)
 // Use the following PrintStream for Unicode characters (card suits)
 PrintStream out = new PrintStream(System.out, true, "UTF-8")
 
-println "Welcome to Double Deck Blackjack! Split once per hand, dealer stands on all 17s."
+println "Welcome to Double Deck Blackjack at Aaron's Casino!"
+println "House Rules: Split once per hand, dealer stands on all 17s."
 
 enum Suit { 
     CLUBS("\u2663"),
