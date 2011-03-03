@@ -389,7 +389,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
     }
 
     if (dealerHasBJ && playerHasBJ)
-      println "Dealer and Player have Blackjack!"
+      println "What are the odds!"
     else if (playerHasBJ)
       playerStake += playerBet * 1.5
     else if (dealerHasBJ)
@@ -461,9 +461,6 @@ NEWHAND: while (shoe.size() > CUTCARD) {
 
         DEALERHAND: while (shoe.size() > CUTCARD) {
 
-            def testNumDealerAces = numDealerAces
-            def testDealerAcesAdjusted = dealerAcesAdjusted
-            def testDealerTotal = dealerTotal
             if ( (!isSplit && playerTotal < 22 && dealerCanTakeCard(numDealerAces, dealerAcesAdjusted, dealerTotal)) ||
                 (isSplit && !(split1Hand.playerTotal > 21 && split2Hand.playerTotal > 21) && dealerCanTakeCard(numDealerAces, dealerAcesAdjusted, dealerTotal)) ) {
 
