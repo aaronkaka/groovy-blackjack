@@ -168,8 +168,8 @@ class PlayerHand {
 
 Random generator = new Random()
 
-static final int ACE = 11
-static final int CUTCARD = generator.nextInt(5) + 5
+final int ACE = 11
+final int CUTCARD = generator.nextInt(5) + 5
 
 
 // CLOSURES
