@@ -6,7 +6,7 @@
 // adjusted down to a value of 1.
 
 import java.text.NumberFormat
-import java.io.PrintStream
+import javax.swing.JFrame
 
 NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.US)
 // Use the following PrintStream for Unicode characters (card suits)
@@ -312,7 +312,18 @@ NEWHAND: while (shoe.size() > CUTCARD) {
 
     println "***************************************"
     Thread.sleep(2000)
-    
+
+    def gamePanel = new GamePanel("../images/")
+
+    JFrame jframe = new JFrame()
+    jframe.getContentPane().add(gamePanel)
+    jframe.setSize(370,370)
+    jframe.setTitle("Aaron's Casino Blackjack")
+    jframe.setVisible(true)
+    jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+
+    gamePanel.updatePanel()
+
     if (playerStake <= 0) break NEWHAND
 
     print "Your stake is ${nf.format(playerStake)}. Enter bet or quit(q): "
