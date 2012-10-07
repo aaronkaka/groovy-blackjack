@@ -1,3 +1,5 @@
+package src
+
 import java.text.NumberFormat
 import javax.swing.JFrame
 
@@ -306,7 +308,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
     println "***************************************"
     Thread.sleep(2000)
 
-    def gamePanel = new GamePanel("../images/")
+    def gamePanel = new GamePanel()
 
     JFrame jframe = new JFrame()
     jframe.getContentPane().add(gamePanel)
