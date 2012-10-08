@@ -1,5 +1,3 @@
-package src
-
 import java.text.NumberFormat
 import javax.swing.JFrame
 
@@ -32,11 +30,29 @@ class Card {
     String rank
     String suit
     int value
+    String imageFilename
 
     Card (String r, Suit s, int v) {
-      rank = r
-      suit = s
-      value = v
+        rank = r
+        suit = s
+        value = v
+
+        switch ( s ) {
+            case Suit.CLUBS:
+                imageFilename = "clubs"
+                break;
+            case Suit.DIAMONDS:
+                imageFilename = "diamonds"
+                break;
+            case Suit.HEARTS:
+                imageFilename = "hearts"
+                break;
+            case Suit.SPADES:
+                imageFilename = "spades"
+                break;
+        }
+
+        imageFilename += "-" + rank.toLowerCase() + "-75.png"
     }
 
     def show() {
@@ -317,8 +333,6 @@ NEWHAND: while (shoe.size() > CUTCARD) {
     jframe.setVisible(true)
     jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
 
-    gamePanel.updatePanel()
-
     if (playerStake <= 0) break NEWHAND
 
     print "Your stake is ${nf.format(playerStake)}. Enter bet or quit(q): "
@@ -354,6 +368,8 @@ NEWHAND: while (shoe.size() > CUTCARD) {
 
     println "Dealer is showing: "
     card4.show()
+    gamePanel.updatePanel(card4.imageFilename)
+
     Thread.sleep(1000)
     println "You have: "
     showPair(card1, card3)

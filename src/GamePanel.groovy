@@ -1,5 +1,3 @@
-package src
-
 import javax.swing.JPanel
 import java.awt.Graphics
 import java.awt.image.BufferedImage
@@ -33,13 +31,10 @@ class GamePanel extends JPanel {
 
     }
 
-    public void updatePanel() {
+    public void updatePanel(String imageFilename) {
 
-        dealerCards.add(ImageIO.read(new File(imagePath + "back-red-75-2.png")))
-        dealerCards.add(ImageIO.read(new File(imagePath + "clubs-2-75.png")))
-
-        playerCards.add(ImageIO.read(new File(imagePath + "back-red-75-2.png")))
-        playerCards.add(ImageIO.read(new File(imagePath + "clubs-2-75.png")))
+        dealerCards.add(ImageIO.read(new File(imagePath + imageFilename)))
+        playerCards.add(ImageIO.read(new File(imagePath + imageFilename)))
 
         repaint()
     }
