@@ -31,21 +31,21 @@ class GamePanel extends JPanel {
 
     }
 
-    public void updatePanel(String imageFilename) {
+    public void updatePanel(String which, String imageFilename) {
 
-        dealerCards.add(ImageIO.read(new File(imagePath + imageFilename)))
-        playerCards.add(ImageIO.read(new File(imagePath + imageFilename)))
+        if (which.equalsIgnoreCase("dealer")) {
+            dealerCards.add(ImageIO.read(new File(imagePath + imageFilename)))
+        } else {
+            playerCards.add(ImageIO.read(new File(imagePath + imageFilename)))
+        }
 
         repaint()
     }
 
-    public void resetRegularHand(which) {
+    public void resetX() {
 
-        if (which == 'dealer') {
-            dealerCards.clear()
-        } else {
-            playerCards.clear()
-        }
+        dealer_x_coord = 35
+        player_x_coord = 35
     }
 
     public void paint(Graphics g) {
@@ -61,6 +61,7 @@ class GamePanel extends JPanel {
             g.drawImage(it, player_x_coord, player_y_coord, null)
             player_x_coord += regularOffset
         }
+        resetX()
 
         g.setFont(new Font(fontName, fontStyle, fontSize))
         g.drawString("Dealer", dealer_x_title, dealer_y_title)

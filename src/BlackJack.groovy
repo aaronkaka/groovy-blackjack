@@ -55,7 +55,7 @@ class Card {
         imageFilename += "-" + rank.toLowerCase() + "-75.png"
     }
 
-    def show() {
+    def show(String which, GamePanel gamePanel) {
 
         PrintStream out = new PrintStream(System.out, true, "UTF-8")
 
@@ -70,6 +70,8 @@ class Card {
         out.println "|" + suit.padLeft(padding-2) + " |"
         println "|" + rank.padLeft(padding-2) + " |"
         println "-".padRight(padding+1, '-')
+
+        gamePanel.updatePanel(which, this.imageFilename)
     }
 }
 
@@ -96,7 +98,7 @@ class PlayerHand {
         splitAces = splittingAces
     }
 
-    def playOut() {
+    def playOut(GamePanel gamePanel) {
 
       if (!splitAces) {
 
@@ -119,7 +121,7 @@ class PlayerHand {
 
                 def nextCard = shoe.remove(0)
                 println "Player receives:"
-                nextCard.show()
+                nextCard.show("player", gamePanel)
                 Thread.sleep(1000)
 
                 if (nextCard.rank == 'A') numPlayerAces++
@@ -218,21 +220,21 @@ def dealerCanTakeCard = { numAces, numAdjusted, total ->
 
 def showPair = { firstCard, secondCard ->
 
-        def padding = 10
+    def padding = 10
 
-        println "-".padRight(padding+1, '-') + "  " + "-".padRight(padding+1, '-')
-        print "| " + firstCard.rank.padRight(padding-2) + "|  "
-        println "| " + secondCard.rank.padRight(padding-2) + "|"
-        out.print "| " + firstCard.suit.padRight(padding-2) + "|  "
-        out.println "| " + secondCard.suit.padRight(padding-2) + "|"
-        2.times {
-          println "|".padRight(padding) + "|  " + "|".padRight(padding) + "|"
-        }
-        out.print "|" + firstCard.suit.padLeft(padding-2) + " |  "
-        out.println "|" + secondCard.suit.padLeft(padding-2) + " |"
-        print "|" + firstCard.rank.padLeft(padding-2) + " |  "
-        println "|" + secondCard.rank.padLeft(padding-2) + " |"
-        println "-".padRight(padding+1, '-') + "  " + "-".padRight(padding+1, '-')
+    println "-".padRight(padding+1, '-') + "  " + "-".padRight(padding+1, '-')
+    print "| " + firstCard.rank.padRight(padding-2) + "|  "
+    println "| " + secondCard.rank.padRight(padding-2) + "|"
+    out.print "| " + firstCard.suit.padRight(padding-2) + "|  "
+    out.println "| " + secondCard.suit.padRight(padding-2) + "|"
+    2.times {
+      println "|".padRight(padding) + "|  " + "|".padRight(padding) + "|"
+    }
+    out.print "|" + firstCard.suit.padLeft(padding-2) + " |  "
+    out.println "|" + secondCard.suit.padLeft(padding-2) + " |"
+    print "|" + firstCard.rank.padLeft(padding-2) + " |  "
+    println "|" + secondCard.rank.padLeft(padding-2) + " |"
+    println "-".padRight(padding+1, '-') + "  " + "-".padRight(padding+1, '-')
 }
 
 def processSplitHand = { splitHand, dealerTotal, dealerHasBJ, playerStake, which ->
@@ -367,12 +369,13 @@ NEWHAND: while (shoe.size() > CUTCARD) {
     card4 = shoe.remove(0)
 
     println "Dealer is showing: "
-    card4.show()
-    gamePanel.updatePanel(card4.imageFilename)
+    card4.show("dealer", gamePanel)
 
     Thread.sleep(1000)
     println "You have: "
     showPair(card1, card3)
+    gamePanel.updatePanel("player", card1.imageFilename)
+    gamePanel.updatePanel("player", card3.imageFilename)
 
     if (card4.rank == 'A') {
         print "Do you want insurance (y/n)? "
@@ -433,7 +436,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
 
         if (!isSplit) {
 
-            playerHand.playOut()
+            playerHand.playOut(gamePanel)
             playerStake = playerHand.playerStake // account for player bust
             playerBet = playerHand.playerBet // account for double down bet and not busted
             playerTotal = playerHand.playerTotal
@@ -447,6 +450,8 @@ NEWHAND: while (shoe.size() > CUTCARD) {
 
             println "\nFirst split hand:"
             showPair(card1, split1)
+            gamePanel.updatePanel("player", card1.imageFilename)
+            gamePanel.updatePanel("player", split1.imageFilename)
 
             playerTotal = card1.value + split1.value
             numPlayerAces = 0
@@ -460,11 +465,13 @@ NEWHAND: while (shoe.size() > CUTCARD) {
                 split1PlayerHasBJ = true
             }
             split1Hand = new PlayerHand(shoe, CUTCARD, playerBet, playerStake, playerTotal, numPlayerAces, playerAcesAdjusted, split1PlayerHasBJ, splittingAces)
-            split1Hand.playOut()
+            split1Hand.playOut(gamePanel)
             playerStake = split1Hand.playerStake // account for player bust on hit/double
 
             println "\nSecond split hand:"
             showPair(card3, split2)
+            gamePanel.updatePanel("player", card3.imageFilename)
+            gamePanel.updatePanel("player", split2.imageFilename)
 
             playerTotal = card3.value + split2.value
             numPlayerAces = 0
@@ -478,7 +485,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
                 split2PlayerHasBJ = true
             }
             split2Hand = new PlayerHand(shoe, CUTCARD, playerBet, playerStake, playerTotal, numPlayerAces, playerAcesAdjusted, split2PlayerHasBJ, splittingAces)
-            split2Hand.playOut()
+            split2Hand.playOut(gamePanel)
             playerStake = split2Hand.playerStake // account for player bust on hit/double
         }
 
@@ -489,7 +496,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
 
                 def nextCard = shoe.remove(0)
                 println "Dealer receives:"
-                nextCard.show()
+                nextCard.show("dealer", gamePanel)
 
                 if (nextCard.rank == 'A') numDealerAces++
 
@@ -528,7 +535,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
 
     Thread.sleep(2000)
     println "Dealer's other card was:"
-    card2.show()
+    card2.show("dealer", gamePanel)
 
     if (!isSplit) {
         println "Dealer totals " + dealerTotal + " and player totals " + playerTotal
