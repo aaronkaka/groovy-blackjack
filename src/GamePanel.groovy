@@ -27,7 +27,7 @@ class GamePanel extends JPanel {
 
     public GamePanel() {
 
-        this.setBackground(Color.green)
+        this.setBackground(Color.green.darker().darker())
 
     }
 
@@ -63,6 +63,7 @@ class GamePanel extends JPanel {
         }
         resetX()
 
+        g.setColor(Color.white)
         g.setFont(new Font(fontName, fontStyle, fontSize))
         g.drawString("Dealer", dealer_x_title, dealer_y_title)
         g.drawString("Player", player_x_title, player_y_title)
