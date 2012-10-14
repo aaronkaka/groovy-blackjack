@@ -25,13 +25,13 @@ class GamePanel extends JPanel {
     def fontStyle = 1
     def fontSize = 16
 
-    public GamePanel() {
+    GamePanel() {
 
         this.setBackground(Color.green.darker().darker())
 
     }
 
-    public void updatePanel(String which, String imageFilename) {
+    void updatePanel(String which, String imageFilename) {
 
         if (which.equalsIgnoreCase("dealer")) {
             dealerCards.add(ImageIO.read(new File(imagePath + imageFilename)))
@@ -42,13 +42,21 @@ class GamePanel extends JPanel {
         repaint()
     }
 
-    public void resetX() {
+    void dealHoleCard() {
+        dealerCards.add(ImageIO.read(new File(imagePath + "back-blue-75-2.png")))
+    }
+
+    void vanishHoleCard() {
+        dealerCards.remove(0)
+    }
+
+    void resetX() {
 
         dealer_x_coord = 35
         player_x_coord = 35
     }
 
-    public void paint(Graphics g) {
+    void paint(Graphics g) {
 
         super.paintComponent(g)
 

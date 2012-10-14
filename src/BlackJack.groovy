@@ -369,12 +369,13 @@ NEWHAND: while (shoe.size() > CUTCARD) {
     card4 = shoe.remove(0)
 
     println "Dealer is showing: "
+    gamePanel.dealHoleCard()
     card4.show("dealer", gamePanel)
 
-    Thread.sleep(1000)
     println "You have: "
     showPair(card1, card3)
     gamePanel.updatePanel("player", card1.imageFilename)
+    Thread.sleep(500)
     gamePanel.updatePanel("player", card3.imageFilename)
 
     if (card4.rank == 'A') {
@@ -535,6 +536,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
 
     Thread.sleep(2000)
     println "Dealer's other card was:"
+    gamePanel.vanishHoleCard()
     card2.show("dealer", gamePanel)
 
     if (!isSplit) {
