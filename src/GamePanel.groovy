@@ -1,9 +1,6 @@
-import javax.swing.JPanel
-import java.awt.Graphics
-import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
-import java.awt.Color
-import java.awt.Font
+import javax.swing.*
+import java.awt.*
 
 class GamePanel extends JPanel {
 
@@ -19,16 +16,14 @@ class GamePanel extends JPanel {
     def player_x_title = player_x_coord + 30
     def player_y_title = player_y_coord - 10
 
-    def imagePath = "../img/"
+    def imagePath = "img/"
     def regularOffset = 25
     def fontName = "Times New Roman"
     def fontStyle = 1
     def fontSize = 16
 
     GamePanel() {
-
         this.setBackground(Color.green.darker().darker())
-
     }
 
     void updatePanel(String which, String imageFilename) {
@@ -43,7 +38,14 @@ class GamePanel extends JPanel {
     }
 
     void dealHoleCard() {
-        dealerCards.add(ImageIO.read(new File(imagePath + "back-blue-75-2.png")))
+
+        File f = new File(imagePath + "back-blue-75-2.png")
+
+        if ( f.exists() ) {
+            dealerCards.add(ImageIO.read(f))
+        } else {
+            println( "Missing hole card image at " + imagePath );
+        }
     }
 
     void vanishHoleCard() {

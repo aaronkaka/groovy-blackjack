@@ -201,8 +201,7 @@ def shuffle = { numDecks, addDeckClosure ->
         shoe.add(combinedDecks.remove(generator.nextInt(combinedDecks.size())))
     }
 
-    //if (shoe.size() != numDecks*52)
-    //    println "Shoe was not correctly generated! (Shoe size is ${shoe.size()})"
+    assert shoe.size == numDecks*52
 
     return shoe
 }
@@ -569,3 +568,4 @@ NEWHAND: while (shoe.size() > CUTCARD) {
 } // end NEWHAND
 
 println "Player walks away with ${nf.format(playerStake)}\n"
+System.exit(0)
