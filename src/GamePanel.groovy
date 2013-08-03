@@ -11,27 +11,37 @@ class GamePanel extends JPanel {
     def dealer_y_title = dealer_y_coord - 10
 
     def playerCards = []
+    def playerCardsSplit1 = []
+    def playerCardsSplit2 = []
     def player_x_coord = 35
     def player_y_coord = 210
     def player_x_title = player_x_coord + 30
     def player_y_title = player_y_coord - 10
 
     def imagePath = "img/"
-    def regularOffset = 25
     def fontName = "Times New Roman"
     def fontStyle = 1
     def fontSize = 16
+
+    def regularOffset = 25
+    def splitOffset = 100
 
     GamePanel() {
         this.setBackground(Color.green.darker().darker())
     }
 
-    void updatePanel(String which, String imageFilename) {
+    void updatePanel(String which, String imageFilename, boolean isFirstSplit = false, boolean isSecondSplit = false) {
 
         if (which.equalsIgnoreCase("dealer")) {
             dealerCards.add(ImageIO.read(new File(imagePath + imageFilename)))
         } else {
-            playerCards.add(ImageIO.read(new File(imagePath + imageFilename)))
+            if (isFirstSplit) {
+                playerCardsSplit1.add(ImageIO.read(new File(imagePath + imageFilename)))
+            } else if (isSecondSplit) {
+                playerCardsSplit2.add(ImageIO.read(new File(imagePath + imageFilename)))
+            } else {
+                playerCards.add(ImageIO.read(new File(imagePath + imageFilename)))
+            }
         }
 
         repaint()
@@ -52,7 +62,7 @@ class GamePanel extends JPanel {
         dealerCards.remove(0)
     }
 
-    void resetX() {
+    void resetXCoordForRepaint() {
 
         dealer_x_coord = 35
         player_x_coord = 35
@@ -67,11 +77,31 @@ class GamePanel extends JPanel {
             dealer_x_coord += regularOffset
         }
 
-        playerCards.each {
-            g.drawImage(it, player_x_coord, player_y_coord, null)
-            player_x_coord += regularOffset
+        if (playerCardsSplit1) {
+            playerCardsSplit1.each {
+                g.drawImage(it, player_x_coord, player_y_coord, null)
+                player_x_coord += regularOffset
+            }
         }
-        resetX()
+
+        if (playerCardsSplit2) {
+
+            player_x_coord += splitOffset
+
+            playerCardsSplit2.each {
+                g.drawImage(it, player_x_coord, player_y_coord, null)
+                player_x_coord += regularOffset
+            }
+        }
+
+        if (!playerCardsSplit1) {
+            playerCards.each {
+                g.drawImage(it, player_x_coord, player_y_coord, null)
+                player_x_coord += regularOffset
+            }
+        }
+
+        resetXCoordForRepaint()
 
         g.setColor(Color.white)
         g.setFont(new Font(fontName, fontStyle, fontSize))

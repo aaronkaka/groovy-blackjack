@@ -1,5 +1,5 @@
-import java.text.NumberFormat
 import javax.swing.JFrame
+import java.text.NumberFormat
 
 NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.US)
 // Use the following PrintStream for Unicode characters (card suits)
@@ -55,7 +55,7 @@ class Card {
         imageFilename += "-" + rank.toLowerCase() + "-75.png"
     }
 
-    def show(String which, GamePanel gamePanel) {
+    def show(String which, GamePanel gamePanel, boolean isFirstSplit = false, boolean isSecondSplit = false) {
 
         PrintStream out = new PrintStream(System.out, true, "UTF-8")
 
@@ -71,7 +71,7 @@ class Card {
         println "|" + rank.padLeft(padding-2) + " |"
         println "-".padRight(padding+1, '-')
 
-        gamePanel.updatePanel(which, this.imageFilename)
+        gamePanel.updatePanel(which, this.imageFilename, isFirstSplit, isSecondSplit)
     }
 }
 
@@ -98,7 +98,7 @@ class PlayerHand {
         splitAces = splittingAces
     }
 
-    def playOut(GamePanel gamePanel) {
+    def playOut(GamePanel gamePanel, boolean isFirstSplit = false, boolean isSecondSplit = false) {
 
       if (!splitAces) {
 
@@ -121,7 +121,7 @@ class PlayerHand {
 
                 def nextCard = shoe.remove(0)
                 println "Player receives:"
-                nextCard.show("player", gamePanel)
+                nextCard.show("player", gamePanel, isFirstSplit, isSecondSplit) // pass through the split indicators
                 Thread.sleep(1000)
 
                 if (nextCard.rank == 'A') numPlayerAces++
@@ -299,20 +299,20 @@ def addDeck = { deck ->
 }
 
 def testDeck = { deck ->
-    deck.add(new Card('A', Suit.CLUBS, ACE))
-    deck.add(new Card('A', Suit.HEARTS, ACE))
-    deck.add(new Card('A', Suit.DIAMONDS, ACE))
-    deck.add(new Card('A', Suit.SPADES, ACE))
     deck.add(new Card('J', Suit.HEARTS, 10))
-    deck.add(new Card('A', Suit.SPADES, ACE))
-    deck.add(new Card('A', Suit.SPADES, ACE))
+    deck.add(new Card('J', Suit.DIAMONDS, 10))
+    deck.add(new Card('J', Suit.CLUBS, 10))
+    deck.add(new Card('J', Suit.SPADES, 10))
     deck.add(new Card('J', Suit.HEARTS, 10))
+    deck.add(new Card('J', Suit.SPADES, 10))
+    deck.add(new Card('J', Suit.DIAMONDS, 10))
     deck.add(new Card('J', Suit.HEARTS, 10))
-    deck.add(new Card('A', Suit.SPADES, ACE))
-    deck.add(new Card('A', Suit.SPADES, ACE))
-    deck.add(new Card('A', Suit.SPADES, ACE))
+    deck.add(new Card('J', Suit.SPADES, 10))
     deck.add(new Card('J', Suit.HEARTS, 10))
-    deck.add(new Card('A', Suit.SPADES, ACE))
+    deck.add(new Card('J', Suit.CLUBS, 10))
+    deck.add(new Card('J', Suit.SPADES, 10))
+    deck.add(new Card('J', Suit.HEARTS, 10))
+    deck.add(new Card('J', Suit.DIAMONDS, 10))
 }
 // END CLOSURES
 
@@ -325,6 +325,11 @@ NEWHAND: while (shoe.size() > CUTCARD) {
     println "***************************************"
     Thread.sleep(2000)
 
+    if (playerStake <= 0) break NEWHAND
+
+    print "Your stake is ${nf.format(playerStake)}. Enter bet or quit(q): "
+    def betInput = new BufferedReader(new InputStreamReader(System.in)).readLine()
+
     def gamePanel = new GamePanel()
 
     JFrame jframe = new JFrame()
@@ -333,11 +338,6 @@ NEWHAND: while (shoe.size() > CUTCARD) {
     jframe.setTitle("Aaron's Casino Blackjack")
     jframe.setVisible(true)
     jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-
-    if (playerStake <= 0) break NEWHAND
-
-    print "Your stake is ${nf.format(playerStake)}. Enter bet or quit(q): "
-    def betInput = new BufferedReader(new InputStreamReader(System.in)).readLine()
 
     try {
         playerBet = Integer.parseInt(betInput)
@@ -450,8 +450,8 @@ NEWHAND: while (shoe.size() > CUTCARD) {
 
             println "\nFirst split hand:"
             showPair(card1, split1)
-            gamePanel.updatePanel("player", card1.imageFilename)
-            gamePanel.updatePanel("player", split1.imageFilename)
+            gamePanel.updatePanel("player", card1.imageFilename, true, false)
+            gamePanel.updatePanel("player", split1.imageFilename, true, false)
 
             playerTotal = card1.value + split1.value
             numPlayerAces = 0
@@ -465,13 +465,13 @@ NEWHAND: while (shoe.size() > CUTCARD) {
                 split1PlayerHasBJ = true
             }
             split1Hand = new PlayerHand(shoe, CUTCARD, playerBet, playerStake, playerTotal, numPlayerAces, playerAcesAdjusted, split1PlayerHasBJ, splittingAces)
-            split1Hand.playOut(gamePanel)
+            split1Hand.playOut(gamePanel, true, false)
             playerStake = split1Hand.playerStake // account for player bust on hit/double
 
             println "\nSecond split hand:"
             showPair(card3, split2)
-            gamePanel.updatePanel("player", card3.imageFilename)
-            gamePanel.updatePanel("player", split2.imageFilename)
+            gamePanel.updatePanel("player", card3.imageFilename, false, true)
+            gamePanel.updatePanel("player", split2.imageFilename, false, true)
 
             playerTotal = card3.value + split2.value
             numPlayerAces = 0
@@ -485,7 +485,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
                 split2PlayerHasBJ = true
             }
             split2Hand = new PlayerHand(shoe, CUTCARD, playerBet, playerStake, playerTotal, numPlayerAces, playerAcesAdjusted, split2PlayerHasBJ, splittingAces)
-            split2Hand.playOut(gamePanel)
+            split2Hand.playOut(gamePanel, false, true)
             playerStake = split2Hand.playerStake // account for player bust on hit/double
         }
 
