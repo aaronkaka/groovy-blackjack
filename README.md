@@ -8,7 +8,7 @@ Created and tested with Java 6 and Groovy 1.8. I did have to be UTF-8 compliant 
 ## Goals
 Initially the goal was to create a simple Groovy command-line executable script to simulate casino-style Blackjack
 purely with text characters. As with all such things, I found that in fact it was a little more complex than I hoped,
-due to features like multiple decks, splitting hands, insurance, card graphics, etc.
+due to features like multiple decks, insurance, card graphics, splitting hands, a special rule when splitting Aces, etc.
 
 So now I've created a Swing game panel that has graphical representation of the card hands for the dealer and player.
 The input at this time is still CLI-driven, but that may evolve as well.

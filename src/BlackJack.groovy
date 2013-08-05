@@ -1,9 +1,8 @@
 import javax.swing.JFrame
 import java.text.NumberFormat
 
+def devMode = false
 NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.US)
-// Use the following PrintStream for Unicode characters (card suits)
-PrintStream out = new PrintStream(System.out, true, "UTF-8")
 
 println "Welcome to Double Deck Blackjack at Aaron's Casino!"
 println "House Rules: Split once per hand, dealer stands on all 17s."
@@ -57,19 +56,20 @@ class Card {
 
     def show(String which, GamePanel gamePanel, boolean isFirstSplit = false, boolean isSecondSplit = false) {
 
+        // Use the following PrintStream for Unicode characters (card suits)
         PrintStream out = new PrintStream(System.out, true, "UTF-8")
 
         def padding = 10
 
-        println "-".padRight(padding+1, '-')
-        println "| " + rank.padRight(padding-2) + "|"
+        out.println "-".padRight(padding+1, '-')
+        out.println "| " + rank.padRight(padding-2) + "|"
         out.println "| " + suit.padRight(padding-2) + "|"
         2.times {
-          println "|".padRight(padding) + "|"
+            out.println "|".padRight(padding) + "|"
         }
         out.println "|" + suit.padLeft(padding-2) + " |"
-        println "|" + rank.padLeft(padding-2) + " |"
-        println "-".padRight(padding+1, '-')
+        out.println "|" + rank.padLeft(padding-2) + " |"
+        out.println "-".padRight(padding+1, '-')
 
         gamePanel.updatePanel(which, this.imageFilename, isFirstSplit, isSecondSplit)
     }
@@ -201,7 +201,9 @@ def shuffle = { numDecks, addDeckClosure ->
         shoe.add(combinedDecks.remove(generator.nextInt(combinedDecks.size())))
     }
 
-    assert shoe.size == numDecks*52
+    if (!devMode) {
+        assert shoe.size == numDecks * 52
+    }
 
     return shoe
 }
@@ -219,21 +221,24 @@ def dealerCanTakeCard = { numAces, numAdjusted, total ->
 
 def showPair = { firstCard, secondCard ->
 
+    // Use the following PrintStream for Unicode characters (card suits)
+    PrintStream out = new PrintStream(System.out, true, "UTF-8")
+
     def padding = 10
 
-    println "-".padRight(padding+1, '-') + "  " + "-".padRight(padding+1, '-')
-    print "| " + firstCard.rank.padRight(padding-2) + "|  "
-    println "| " + secondCard.rank.padRight(padding-2) + "|"
+    out.println "-".padRight(padding+1, '-') + "  " + "-".padRight(padding+1, '-')
+    out.print "| " + firstCard.rank.padRight(padding-2) + "|  "
+    out.println "| " + secondCard.rank.padRight(padding-2) + "|"
     out.print "| " + firstCard.suit.padRight(padding-2) + "|  "
     out.println "| " + secondCard.suit.padRight(padding-2) + "|"
     2.times {
-      println "|".padRight(padding) + "|  " + "|".padRight(padding) + "|"
+        out.println "|".padRight(padding) + "|  " + "|".padRight(padding) + "|"
     }
     out.print "|" + firstCard.suit.padLeft(padding-2) + " |  "
     out.println "|" + secondCard.suit.padLeft(padding-2) + " |"
-    print "|" + firstCard.rank.padLeft(padding-2) + " |  "
-    println "|" + secondCard.rank.padLeft(padding-2) + " |"
-    println "-".padRight(padding+1, '-') + "  " + "-".padRight(padding+1, '-')
+    out.print "|" + firstCard.rank.padLeft(padding-2) + " |  "
+    out.println "|" + secondCard.rank.padLeft(padding-2) + " |"
+    out.println "-".padRight(padding+1, '-') + "  " + "-".padRight(padding+1, '-')
 }
 
 def processSplitHand = { splitHand, dealerTotal, dealerHasBJ, playerStake, which ->
@@ -317,13 +322,21 @@ def testDeck = { deck ->
 // END CLOSURES
 
 def numOfDecks = 2
-def shoe = shuffle(numOfDecks, addDeck)
 def playerStake = 300
+def shoe
+if (devMode) {
+    shoe = shuffle(numOfDecks, testDeck)
+} else {
+    shoe = shuffle(numOfDecks, addDeck)
+}
 
 NEWHAND: while (shoe.size() > CUTCARD) {
 
-    println "***************************************"
-    Thread.sleep(2000)
+    if (devMode) {
+        println "***************DEV MODE****************"
+    } else {
+        println "***************************************"
+    }
 
     if (playerStake <= 0) break NEWHAND
 
