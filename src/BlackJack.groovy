@@ -3,209 +3,29 @@ import java.text.NumberFormat
 
 def devMode = false
 NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.US)
+Random generator = new Random()
+final int CUTCARD = generator.nextInt(5) + 5
+final int ACE = 11
 
 println "Welcome to Double Deck Blackjack at Aaron's Casino!"
 println "House Rules: Split once per hand, dealer stands on all 17s."
 
-enum Suit { 
-    CLUBS("\u2663"),
-    SPADES("\u2660"),
-    DIAMONDS("\u2666"),
-    HEARTS("\u2665")
-
-    def representation
-
-    Suit(symbol) {
-        this.representation = symbol
-    }
-    
-    @Override
-    public String toString() {
-        return "$representation"
-    }
-}
-
-class Card {
-    String rank
-    String suit
-    int value
-    String imageFilename
-
-    Card (String r, Suit s, int v) {
-        rank = r
-        suit = s
-        value = v
-
-        switch ( s ) {
-            case Suit.CLUBS:
-                imageFilename = "clubs"
-                break;
-            case Suit.DIAMONDS:
-                imageFilename = "diamonds"
-                break;
-            case Suit.HEARTS:
-                imageFilename = "hearts"
-                break;
-            case Suit.SPADES:
-                imageFilename = "spades"
-                break;
-        }
-
-        imageFilename += "-" + rank.toLowerCase() + "-75.png"
-    }
-
-    def show(String which, GamePanel gamePanel, boolean isFirstSplit = false, boolean isSecondSplit = false) {
-
-        // Use the following PrintStream for Unicode characters (card suits)
-        PrintStream out = new PrintStream(System.out, true, "UTF-8")
-
-        def padding = 10
-
-        out.println "-".padRight(padding+1, '-')
-        out.println "| " + rank.padRight(padding-2) + "|"
-        out.println "| " + suit.padRight(padding-2) + "|"
-        2.times {
-            out.println "|".padRight(padding) + "|"
-        }
-        out.println "|" + suit.padLeft(padding-2) + " |"
-        out.println "|" + rank.padLeft(padding-2) + " |"
-        out.println "-".padRight(padding+1, '-')
-
-        gamePanel.updatePanel(which, this.imageFilename, isFirstSplit, isSecondSplit)
-    }
-}
-
-class PlayerHand {
-    ArrayList shoe
-    int CUTCARD
-    int playerBet
-    BigDecimal playerStake
-    int playerTotal
-    int numPlayerAces
-    int playerAcesAdjusted
-    boolean playerHasBJ
-    boolean splitAces
-
-    PlayerHand (ArrayList tableShoe, int cutCard, int bet, BigDecimal stake, int total, int numAces, int acesAdjusted, boolean hasBJ, boolean splittingAces) {
-        shoe = tableShoe
-        CUTCARD = cutCard
-        playerBet = bet
-        playerStake = stake
-        playerTotal = total
-        numPlayerAces = numAces
-        playerAcesAdjusted = acesAdjusted
-        playerHasBJ = hasBJ
-        splitAces = splittingAces
-    }
-
-    def playOut(GamePanel gamePanel, boolean isFirstSplit = false, boolean isSecondSplit = false) {
-
-      if (!splitAces) {
-
-        PLAYERHAND: while (shoe.size() > CUTCARD) {
-            print "Stand(s)/Hit(h)/Double(d)? "
-            def input = new BufferedReader(new InputStreamReader(System.in)).readLine()
-
-            // If Double Down
-            if (input.equalsIgnoreCase("D")) {
-                if (playerBet*2 > playerStake) {
-                    println "You don't have enough money to double your bet!"
-                    continue PLAYERHAND
-                } else {
-                    playerBet *= 2
-                }
-            }
-
-            // If Hit or Double
-            if (!(input.equalsIgnoreCase("S"))) {
-
-                def nextCard = shoe.remove(0)
-                println "Player receives:"
-                nextCard.show("player", gamePanel, isFirstSplit, isSecondSplit) // pass through the split indicators
-                Thread.sleep(1000)
-
-                if (nextCard.rank == 'A') numPlayerAces++
-
-                playerTotal += nextCard.value
-
-                if (playerTotal > 21) {
-
-                    // Check Aces and adjust as necessary
-                    if (numPlayerAces > 0) {
-                        for (int i=0; i < numPlayerAces-playerAcesAdjusted; i++) {
-                          playerTotal -= 10
-                          playerAcesAdjusted++
-                          if (playerTotal < 22) break // for loop
-                        }
-                    }
-                    if (playerTotal > 21) {
-                        println "Player busted!"
-                        playerStake -= playerBet
-                        break PLAYERHAND
-                    }
-                }
-
-                if (input.equalsIgnoreCase("D")) break PLAYERHAND
-
-
-            } else { // Stand
-
-                if (playerTotal > 21) {
-
-                    // Check Aces and adjust as necessary
-                    if (numPlayerAces > 0) {
-                        for (int i=0; i < numPlayerAces-playerAcesAdjusted; i++) {
-                          playerTotal -= 10
-                          playerAcesAdjusted++
-                          if (playerTotal < 22) break // for loop
-                        }
-                    }
-                }
-
-                break PLAYERHAND
-            }
-        } // end PLAYERHAND
-
-       } else {
-
-           // Split Aces, player hand receives no more cards
-           if (playerTotal > 21) {
-               // Player has AA
-               playerTotal -= 10
-               playerAcesAdjusted++
-           }
-       }
-
-    }
-}
-
-Random generator = new Random()
-
-final int ACE = 11
-final int CUTCARD = generator.nextInt(5) + 5
-
-
 // CLOSURES
 def shuffle = { numDecks, addDeckClosure ->
 
-    def shoe = new ArrayList()
     def combinedDecks = new ArrayList()
 
     numDecks.times {
-
         addDeckClosure(combinedDecks)
-        
     }
 
-    while (combinedDecks.size() > 0) {
-        shoe.add(combinedDecks.remove(generator.nextInt(combinedDecks.size())))
-    }
+    Collections.shuffle(combinedDecks)
 
     if (!devMode) {
-        assert shoe.size == numDecks * 52
+        assert combinedDecks.size == numDecks * 52
     }
 
-    return shoe
+    return combinedDecks
 }
 
 def dealerCanTakeCard = { numAces, numAdjusted, total ->
