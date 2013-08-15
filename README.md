@@ -1,6 +1,7 @@
 # Groovy Blackjack
-My first Groovy script, a command-line Blackjack simulator. This was done primarily for fun, but learning
-creeps in... ;)
+![Image](blackjack.jpg?raw=true "Blackjack! Groovy...")
+
+My first Groovy script, a command-line Blackjack simulator.
 
 ## Requirements
 Created and tested with Java 6 and Groovy 1.8. I did have to be UTF-8 compliant for Mac OS X Terminal.
