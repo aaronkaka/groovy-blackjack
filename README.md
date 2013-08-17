@@ -6,6 +6,11 @@ My first Groovy script, a command-line Blackjack simulator.
 ## Requirements
 Created and tested with Java 6 and Groovy 1.8. I did have to be UTF-8 compliant for Mac OS X Terminal.
 
+If executing the game from the command line rather than an IDE, follow the directions for [installing Groovy](http://groovy.codehaus.org/Installing+Groovy)
+and specify the directory for the card images:
+
+    Blackjack/src> groovy blackjack -d "../img"
+
 ## Goals
 Initially the goal was to create a simple Groovy command-line executable script to simulate casino-style Blackjack
 purely with text characters. As with all such things, I found that in fact it was a little more complex than I hoped,

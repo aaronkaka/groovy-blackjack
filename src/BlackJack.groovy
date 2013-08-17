@@ -2,6 +2,15 @@ import javax.swing.JFrame
 import java.text.NumberFormat
 
 def devMode = false
+
+def cl = new CliBuilder(usage: 'groovy Blackjack -d "../img"')
+cl.d(argName:'imgDir', longOpt:'directory', args:1, required:true, 'Directory for images, REQUIRED')
+def opt = cl.parse(args)
+String imageDir = ""
+if (opt) {
+    imageDir = opt.d
+}
+
 NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.US)
 Random generator = new Random()
 final int CUTCARD = generator.nextInt(5) + 5
@@ -163,7 +172,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
     print "Your stake is ${nf.format(playerStake)}. Enter bet or quit(q): "
     def betInput = new BufferedReader(new InputStreamReader(System.in)).readLine()
 
-    def gamePanel = new GamePanel()
+    def gamePanel = new GamePanel(imageDir)
 
     JFrame jframe = new JFrame()
     jframe.getContentPane().add(gamePanel)
@@ -395,7 +404,6 @@ NEWHAND: while (shoe.size() > CUTCARD) {
         playerStake = processSplitHand(split1Hand, dealerTotal, dealerHasBJ, playerStake, "first")
 
         playerStake = processSplitHand(split2Hand, dealerTotal, dealerHasBJ, playerStake, "second")
-
     }
 
 } // end NEWHAND

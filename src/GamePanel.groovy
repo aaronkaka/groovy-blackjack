@@ -18,7 +18,7 @@ class GamePanel extends JPanel {
     def player_x_title = player_x_coord + 30
     def player_y_title = player_y_coord - 10
 
-    def imagePath = "img/"
+    def imagePath = "img"
     def fontName = "Times New Roman"
     def fontStyle = 1
     def fontSize = 16
@@ -26,21 +26,24 @@ class GamePanel extends JPanel {
     def regularOffset = 25
     def splitOffset = 100
 
-    GamePanel() {
+    GamePanel(String imgPath = "") {
+        if (imgPath != "") imagePath = imgPath
         this.setBackground(Color.green.darker().darker())
     }
 
     void updatePanel(String which, String imageFilename, boolean isFirstSplit = false, boolean isSecondSplit = false) {
 
+        String imagePathString = imagePath + "/" + imageFilename
+
         if (which.equalsIgnoreCase("dealer")) {
-            dealerCards.add(ImageIO.read(new File(imagePath + imageFilename)))
+            dealerCards.add(ImageIO.read(new File(imagePathString)))
         } else {
             if (isFirstSplit) {
-                playerCardsSplit1.add(ImageIO.read(new File(imagePath + imageFilename)))
+                playerCardsSplit1.add(ImageIO.read(new File(imagePathString)))
             } else if (isSecondSplit) {
-                playerCardsSplit2.add(ImageIO.read(new File(imagePath + imageFilename)))
+                playerCardsSplit2.add(ImageIO.read(new File(imagePathString)))
             } else {
-                playerCards.add(ImageIO.read(new File(imagePath + imageFilename)))
+                playerCards.add(ImageIO.read(new File(imagePathString)))
             }
         }
 
@@ -49,12 +52,12 @@ class GamePanel extends JPanel {
 
     void dealHoleCard() {
 
-        File f = new File(imagePath + "back-blue-75-2.png")
+        File f = new File(imagePath + "/" + "back-blue-75-2.png")
 
         if ( f.exists() ) {
             dealerCards.add(ImageIO.read(f))
         } else {
-            println( "Missing hole card image at " + imagePath );
+            println( "Missing hole card image at " + imagePath);
         }
     }
 
