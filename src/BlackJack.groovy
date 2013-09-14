@@ -13,7 +13,7 @@ if (opt) {
 
 NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.US)
 Random generator = new Random()
-final int CUTCARD = generator.nextInt(5) + 5
+final int CUTCARD = generator.nextInt(7-5+1) + 5 // Produce a random integer between 5 and 7 inclusive
 final int ACE = 11
 
 println "Welcome to Double Deck Blackjack at Aaron's Casino!"
@@ -148,26 +148,50 @@ def testDeck = { deck ->
     deck.add(new Card('J', Suit.HEARTS, 10))
     deck.add(new Card('J', Suit.DIAMONDS, 10))
 }
+
+def leaveTable = { stake ->
+    println "Player walks away with ${nf.format(stake)}\n"
+    System.exit(0)
+}
 // END CLOSURES
 
+def shoe
 def numOfDecks = 2
 def playerStake = 300
-def shoe
+boolean timeToShuffle = false
+// NEWHAND bootstraps on an existing shuffled shoe
 if (devMode) {
+    println "CUTCARD is " + CUTCARD.toString()
     shoe = shuffle(numOfDecks, testDeck)
 } else {
     shoe = shuffle(numOfDecks, addDeck)
 }
 
-NEWHAND: while (shoe.size() > CUTCARD) {
+NEWHAND: while (shoe.size() > 0) {
+
+    if (playerStake <= 0) {
+        leaveTable(playerStake)
+    }
+
+    if (shoe.size() <= CUTCARD) {
+        timeToShuffle = true
+    }
 
     if (devMode) {
         println "***************DEV MODE****************"
+        if (timeToShuffle) {
+            println "Shuffling Test Deck..."
+            shoe = shuffle(numOfDecks, testDeck)
+            timeToShuffle = false
+        }
     } else {
         println "***************************************"
+        if (timeToShuffle) {
+            println "Shuffling Deck..."
+            shoe = shuffle(numOfDecks, addDeck)
+            timeToShuffle = false
+        }
     }
-
-    if (playerStake <= 0) break NEWHAND
 
     print "Your stake is ${nf.format(playerStake)}. Enter bet or quit(q): "
     def betInput = new BufferedReader(new InputStreamReader(System.in)).readLine()
@@ -184,7 +208,9 @@ NEWHAND: while (shoe.size() > CUTCARD) {
     try {
         playerBet = Integer.parseInt(betInput)
         
-        if (playerBet == 0) break NEWHAND
+        if (playerBet == 0) {
+            leaveTable(playerStake)
+        }
         playerBet = playerBet.abs()
         if (playerBet > playerStake)
         {
@@ -193,7 +219,7 @@ NEWHAND: while (shoe.size() > CUTCARD) {
         }
     }
     catch (Exception e) {
-        break NEWHAND
+        leaveTable(playerStake)
     }
 
     dealerTotal = 0
@@ -407,6 +433,3 @@ NEWHAND: while (shoe.size() > CUTCARD) {
     }
 
 } // end NEWHAND
-
-println "Player walks away with ${nf.format(playerStake)}\n"
-System.exit(0)
